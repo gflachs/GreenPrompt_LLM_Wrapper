@@ -1,4 +1,4 @@
-# Template_MAS_LLM
+# Greenprompt LLM Wrapper
 
 ## Table of Content
 1. [Purpose](#purpose)
@@ -6,6 +6,21 @@
 3. [Contribution](#contribution)
 
 ## Purpose
+
+This service is responsible for managing the lifecycle of a specified LLM. The LLM will be downloaded from Huggingface. The service deploys the LLM and manages the lifecycle of the LLM. The service will be responsible for the following:
+- Downloading the LLM from Huggingface
+- Deploying the LLM
+- Managing the lifecycle of the LLM
+- Sending prompts to the LLM
+- Receiving responses from the LLM
+- Measuring the SCI Score of the LLM
+
+To achieve this, the service will read commands from a file in the file system. The service will read the commands from the file and execute the commands. The service will write the output of the commands ( meas the resulting state of the LLM) to a file in the file system. The service will also write the SCI Score of the LLM to a file in the file system.
+
+### Architecture
+
+<!--![Architecture Overview](./docs/architecture/overview.svg)-->
+
 
 ## Setup
 
