@@ -19,7 +19,7 @@ To achieve this, the service will read commands from a file in the file system. 
 
 ### Architecture
 
-<!--![Architecture Overview](./docs/architectur/overview.puml)-->
+[![Architecture Overview](https://tinyurl.com/2b7fkpak)](https://tinyurl.com/2b7fkpak)<!--![Architecture Overview](./docs/architectur/overview.puml)-->
 
 
 ## Setup
