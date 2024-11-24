@@ -1,0 +1,42 @@
+name: Generate PlantUML Diagrams
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.puml"
+  pull_request:
+    paths:
+      - "**/*.puml"
+  workflow_dispatch:
+
+jobs:
+  plantuml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq
+
+      - name: Find and Generate SVGs for All PlantUML Files
+        run: |
+          for file in $(find . -name "*.puml"); do
+            base_name=$(basename "$file" .puml)
+            dir_name=$(dirname "$file")
+            # Encode the PlantUML source for use in the URL
+            encoded=$(cat "$file" | awk '{gsub(/@startuml/, ""); gsub(/@enduml/, ""); print}' | tr -d '\n' | jq -sRr @uri)
+            # Send to PlantUML server and save the response as SVG
+            curl "http://www.plantuml.com/plantuml/svg/~h${encoded}" -o "$dir_name/$base_name.svg"
+          done
+
+      - name: Commit and Push Generated SVGs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-generate SVG files for all PlantUML diagrams"
+          branch: ${{ github.head_ref }}

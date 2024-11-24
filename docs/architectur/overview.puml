@@ -1,0 +1,35 @@
+@startuml overview
+
+
+cloud "Hugging Face" as HFC {
+    component "Hugging Face" as HF
+}
+
+
+
+package "Fileystem" as FS {
+    component "Command File" as CF
+    component "LLM Output" as LLMOUT
+    component "LLM Input" as LLMI
+    component "LLM State" as LLMSTATE
+}
+package "LLM Wrapper" {
+    
+    component "LLM Wrapper" as LLMW 
+    component "LLM" as LLM
+    component "Green Metrics" as GM <<https://github.com/green-coding-solutions/green-metrics-tool>>
+}
+
+
+
+[LLMW] -left- [HF]: "download model"
+[LLMW] ..> [LLM]: "manage model based on commands"
+[LLMW] ..> [CF]: "read commands"
+[LLMW] ..> [LLMOUT]: "write LLM output and SCI Score"
+[LLMW] ..> [LLMI]: "read LLM input"
+[LLMW] ..> [LLMSTATE]: "writes LLM state"
+[GM] ..> [LLM]: "measure SCI Score"
+[LLMW] ..> [GM]: "collect SCI Score"
+
+
+@enduml
