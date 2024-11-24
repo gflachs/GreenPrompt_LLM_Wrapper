@@ -1,36 +1,40 @@
-name: Generate PlantUML Diagrams
+name: Process PlantUML in Markdown
 
 on:
   push:
     branches:
       - main
     paths:
+      - "**/*.md"
       - "**/*.puml"
   workflow_dispatch:
 
 jobs:
-  plantuml:
+  process_puml:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
+      # Check out the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Get changed UML files
-        id: getfile
-        run: |
-          FILES=$(git diff --name-only HEAD^ HEAD | grep .puml || true)
-          echo "files=$FILES" >> $GITHUB_OUTPUT
-
-      - name: Generate SVG Diagrams
-        if: steps.getfile.outputs.files != ''
-        uses: holowinski/plantuml-github-action@main
+      # Install Node.js (to use npm)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          args: -v -tsvg ${{ steps.getfile.outputs.files }}
+          node-version: '16'
 
-      - name: Push Local Changes
-        if: steps.getfile.outputs.files != ''
+      # Install puml-for-markdown
+      - name: Install puml-for-markdown
+        run: npm install -g puml-for-markdown
+
+      # Run puml-for-markdown to process markdown files
+      - name: Process Markdown with PlantUML
+        run: puml-for-markdown -x . -m .
+
+      # Commit and push the updated Markdown files
+      - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto-generate SVG files for PlantUML diagrams"
+          commit_message: "Auto-Process PlantUML diagrams in Markdown"
           branch: ${{ github.head_ref }}
