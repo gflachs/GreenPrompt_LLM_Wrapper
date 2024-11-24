@@ -2,7 +2,7 @@
 
 
 cloud "Hugging Face" as HFC {
-    component "Hugging Face" as HF
+    component "Hugging Face API" as HF
 }
 
 
