@@ -30,7 +30,7 @@ jobs:
 
       # Run puml-for-markdown to process markdown files
       - name: Process Markdown with PlantUML
-        run: puml-for-markdown -x . -m .
+        run: puml-for-markdown
 
       # Commit and push the updated Markdown files
       - name: Commit and Push Changes
