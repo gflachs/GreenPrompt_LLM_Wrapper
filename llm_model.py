@@ -1,7 +1,9 @@
+# pragma: no cover
 import logging
 import torch
 from transformers import pipeline
 
+# pragma: no cover
 logging.basicConfig(
     filename="llm.log",  
     filemode="w",        
@@ -26,7 +28,7 @@ class LLMModel:
         """
         try:
             self._pipe = pipeline(self.modeltyp, model= self.model, torch_dtype=torch.bfloat16, device_map="auto")
-            logging.info(f"Successfully downloaded the desired model")
+            logging.info("Successfully downloaded the desired model")
         except Exception as e:
             logging.error(f"Failed to download the LLM-Model {self.model} because of following Exception: {e}")
             
@@ -70,42 +72,17 @@ class LLMModel:
     def modeltyp(self):
         return self._modeltyp
 
-    @modeltyp.setter
-    def modeltyp(self, value):
-        pass # currently we do not want to change the modeltyp or give the opportunity to do so
         
-
     @property
     def model(self):
         return self._model
-
-    @model.setter
-    def model(self, value):
-        pass    # currently we do not want to change the model or give the opportunity to do so
+    
         
-
     @property
     def message(self):
         return self._message
-
-    @message.setter
-    def message(self, value):
-        pass    # currently we do not want to let the user set the message and instead create it to 
-        
+    
 
     @property
     def answer(self):
         return self._answer
-
-    @answer.setter
-    def answer(self, value):
-        pass    # theres no need to change the value of answer except within this class 
-        
-
-
-
-
-
-
-
-
