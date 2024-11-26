@@ -16,7 +16,7 @@ while True:
     
     ask_again = input("\nIf you want to ask another question say y:")
 
-    if not (ask_again == "y"):
+    if (ask_again != "y"):
         break
 
 print("Goodbye")    
