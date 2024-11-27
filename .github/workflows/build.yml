@@ -32,6 +32,11 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=src --cov-report=xml:reports/coverage.xml
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: reports/coverage.xml
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
