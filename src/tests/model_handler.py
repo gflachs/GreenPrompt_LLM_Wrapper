@@ -1,4 +1,4 @@
-from app.llm_model import LLMModel
+from src.app.llm_model import LLMModel
 
 # This script is used for terminal-based interaction with the llm_model class 
 # just run it within the terminal with "python model_handler.py"
