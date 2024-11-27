@@ -32,6 +32,9 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=src --cov-report=xml:reports/coverage.xml
+      - name: Fix coverage report paths
+        run: |
+          sed -i 's|/home/runner/work/GreenPrompt_LLM_Wrapper/GreenPrompt_LLM_Wrapper/||g' reports/coverage.xml
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
