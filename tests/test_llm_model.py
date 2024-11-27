@@ -1,6 +1,6 @@
 # pragma: no cover
 import unittest
-from llm_model import LLMModel
+from app.llm_model import LLMModel
 
 # pragma: no cover
 class TestLLMModel(unittest.TestCase):
