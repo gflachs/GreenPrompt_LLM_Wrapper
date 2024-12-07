@@ -1,11 +1,10 @@
-# pragma: no cover
 import unittest
 from src.app.llm_model import LLMModel
 
-# pragma: no cover
+
 class TestLLMModel(unittest.TestCase):
 
-    # pragma: no cover
+    
     def test_init(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
 
@@ -15,29 +14,19 @@ class TestLLMModel(unittest.TestCase):
         self.assertIsNone(llm.message)
         self.assertIsNone(llm.answer)
         self.assertIsNone(llm._prompt)
+        self.assertEqual(llm.status, "idle")
 
 
-    # pragma: no cover
-    def test_getter(self):
-        llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
-
-        self.assertEqual(llm.modeltyp, "text-generation")
-        self.assertEqual(llm.model, "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
-        self.assertIsNone(llm._pipe)
-        self.assertIsNone(llm.message)
-        self.assertIsNone(llm.answer)
-        self.assertIsNone(llm._prompt)
-
-
-    # pragma: no cover
     def test_download_model(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
         self.assertIsNone(llm._pipe)
+        self.assertEqual(llm.status, "idle")
 
         llm.download_model()
         self.assertIsNotNone(llm._pipe)
+        self.assertEqual(llm.status, "ready")
         
-    # pragma: no cover
+  
     def test_answer_question(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
         llm.download_model()
@@ -51,8 +40,32 @@ class TestLLMModel(unittest.TestCase):
         answer = llm.answer_question(question)
 
         self.assertIn(expected_math_answer, math_answer)
-        self.assertIn(expected_answer, answer)       
+        self.assertIn(expected_answer, answer)  
 
-# pragma: no cover
+    def test_isllmresponsive(self):
+        llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        self.assertFalse(llm._isllmresponsive())
+        
+        llm.download_model()
+        self.assertTrue(llm._isllmresponsive())
+        
+
+    def test_shutdownllm(self):
+        llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        llm.download_model()
+        self.assertEqual(llm.status, "ready")
+
+        llm.shutdownllm()
+        self.assertEqual(llm.status, "idle")
+
+    def test_restartllm(self):
+        llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        llm.download_model()
+        self.assertEqual(llm.status, "ready")
+
+        llm.restartllm()
+        self.assertEqual(llm.status, "ready")
+             
+
 if __name__ == '__main__':
     unittest.main()

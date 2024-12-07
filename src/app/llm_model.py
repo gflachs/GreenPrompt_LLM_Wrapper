@@ -1,9 +1,8 @@
-# pragma: no cover
 import logging
 import torch
 from transformers import pipeline
 
-# pragma: no cover
+
 logging.basicConfig(
     filename="llm.log",  
     filemode="w",        
@@ -19,19 +18,72 @@ class LLMModel:
         self._message = None
         self._answer = None
         self._prompt = None
+        self._status = "idle" 
 
     
+    _status_codes = {
+        "not ready" : " LLM Wrapper is not able to process prompts",
+        "failure" : "LLM Wrapper cannot deploy an LLM, or the deployed LLM is unable to process prompts despite repair attempts",
+        "idle" : "LLM Wrapper has no deployed LLM and is waiting for a new deployment",
+        "ready" : "LLM Wrapper has an LLM deployed and is ready to process prompts",
+        "prompting" : "LLM Wrapper is currently in use by the Prompting Service",
+        "deploying" : "LLM is currently being deployed to the Wrapper",
+        "stopping" : "LLM Wrapper is in the process of stopping its current LLM",
+        "shutdown" : "LLM Wrapper is being shut down"
+    }
+
+
    
-    def download_model(self):
+    def download_model(self, attempt = 0):
         """
         downloads a model from huggingface via the api with self.modeltyp and self.model
         """
         try:
             self._pipe = pipeline(self.modeltyp, model= self.model, torch_dtype=torch.bfloat16, device_map="auto")
-            logging.info("Successfully downloaded the desired model")
+            if self._isllmresponsive():
+                self._status = "ready"
+                logging.info(f"{self._status_codes[self.status]}, model = {self.model}")
+            else:
+                logging.info(f"downloaded llm is unresposive try to restart attempt = {attempt + 1}")
+                if attempt <= 3:
+                    self.restartllm(attempt= attempt + 1)
         except Exception as e:
+            self._status = "failure"
             logging.error(f"Failed to download the LLM-Model {self.model} because of following Exception: {e}")
+            logging.error(f"{self._status_codes[self._status]}, model = {self.model}")
             
+
+    def shutdownllm(self):
+        """
+        discards the llm and sets the wrapper to the same state as after initialization 
+        """
+        if self.status == "idle": return
+        
+        self._pipe = None
+        self._message = None
+        self._answer = None
+        self._prompt = None
+        self._status = "idle"
+        logging.info("shutdown llm")
+        logging.info(f"Status: {self.status} - {self._status_codes[self.status]}")
+
+        
+
+    def restartllm(self, attempt = 0):
+        """
+        Restarts the llm. If unable to restart the llm for instance the llm is unresponsive it will start another attempt.
+
+        Args:
+            attempt (int): number of attempt to restart the llm. Default is 0. If attempt >= 3 will set the Wrapper status to failure
+        """
+        if attempt >= 3:
+            self._status = "failure"
+            logging.error(f"failed to restart the llm number of attempts = {attempt}")
+            logging.error(f"Status: {self.status} - {self._status_codes[self._status]}, model = {self.model}")
+        else:
+            self.shutdownllm()
+            self.download_model(attempt = attempt)
+
 
 
     def answer_question(self, question):
@@ -41,7 +93,7 @@ class LLMModel:
         Args: 
             question (str): The question that should be answered by the llm.
 
-        Retruns:
+        Returns:
             string: The answer 
             or None: if no llm has been downloaded
         """
@@ -67,6 +119,26 @@ class LLMModel:
         
         return self.answer
     
+    
+    def _isllmresponsive(self):
+        """
+        sends a prompt to the downloaded llm and returns true if the llm is returning an answer otherwise returns false
+
+        Returns:
+            bool: true if the llm can send answer questions otherwise false
+        """
+        example = "Whats the capitol of germany?"
+        llmresponse = self.answer_question(example)
+        if llmresponse is None: 
+            logging.debug(f"llm {self.model} doesn't answer questions return value is None")
+            return False  
+        if isinstance(llmresponse, str): 
+            logging.info(f"llm {self.model} can answer questions")
+            return True   
+        logging.debug(f"llm {self.model} doesn't answer questions, reason unknown")        
+        return False
+
+    
 
     @property
     def modeltyp(self):
@@ -86,3 +158,7 @@ class LLMModel:
     @property
     def answer(self):
         return self._answer
+    
+    @property
+    def status(self):
+        return self._status
