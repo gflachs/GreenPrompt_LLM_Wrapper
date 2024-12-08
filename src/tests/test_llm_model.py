@@ -1,7 +1,6 @@
 import unittest
 from src.app.llm_model import LLMModel
 
-
 class TestLLMModel(unittest.TestCase):
 
     
@@ -49,6 +48,11 @@ class TestLLMModel(unittest.TestCase):
         llm.download_model()
         self.assertTrue(llm._isllmresponsive())
         
+    def test_isllmresponsive_unresponsive(self):
+        llm = LLMModel(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        llm.download_model()
+        llm.answer_question = lambda x: None 
+        self.assertFalse(llm._isllmresponsive())
 
     def test_shutdownllm(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
