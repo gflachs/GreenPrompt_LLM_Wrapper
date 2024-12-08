@@ -1,8 +1,9 @@
+import gc
 import logging
+
 import torch
 import asyncio
 from transformers import pipeline
-
 
 logging.basicConfig(
     filename="llm.log",
@@ -69,6 +70,8 @@ class LLMModel:
             return
 
         try:
+            del self._pipe
+            gc.collect()
             self._pipe = None
             self._message = None
             self._answer = None
