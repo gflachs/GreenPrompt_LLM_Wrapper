@@ -24,6 +24,8 @@ class TestLLMModel(unittest.TestCase):
         llm.download_model()
         self.assertIsNotNone(llm._pipe)
         self.assertEqual(llm.status, "ready")
+
+        llm.download_model(attempt=4)
         
   
     def test_answer_question(self):
@@ -56,6 +58,9 @@ class TestLLMModel(unittest.TestCase):
 
     def test_shutdownllm(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        llm.shutdownllm()
+        self.assertEqual(llm.status, "idle")
+
         llm.download_model()
         self.assertEqual(llm.status, "ready")
 
@@ -64,11 +69,17 @@ class TestLLMModel(unittest.TestCase):
 
     def test_restartllm(self):
         llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        llm.restartllm()
+        self.assertEqual(llm.status, "idle")
+
         llm.download_model()
         self.assertEqual(llm.status, "ready")
 
         llm.restartllm()
         self.assertEqual(llm.status, "ready")
+
+        llm.restartllm(attempt=3)
+        self.assertEqual(llm.status, "failure")
              
 
 if __name__ == '__main__':
