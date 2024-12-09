@@ -1,5 +1,6 @@
 import logging
 import torch
+import asyncio
 from transformers import pipeline
 
 
@@ -43,7 +44,7 @@ class LLMModel:
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
-            if self._isllmresponsive():
+            if await_self._isllmresponsive():
                 self._status = "ready"
                 logging.info(f"{self._status_codes[self.status]}, model = {self.model}")
             else:
@@ -171,7 +172,15 @@ class LLMModel:
         except Exception as e:
             logging.error(f"Error during model responsiveness check: {e}")
             return False
-
+        
+    async def monitor_llm(self):
+        while True:
+            if self._status == "ready":
+                if not await self._isllmresponsive():
+                    logging.warning("LLM is unresponsive, attempting to restart.")
+                    await self.restartllm()
+            await asyncio.sleep(60)  # Check every 60 seconds
+        
     @property
     def modeltyp(self):
         return self._modeltyp
