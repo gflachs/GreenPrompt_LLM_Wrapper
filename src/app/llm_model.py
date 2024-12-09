@@ -1,5 +1,6 @@
 import gc
 import logging
+import psutil  # for memory monitoring
 
 import torch
 from transformers import pipeline
@@ -21,6 +22,8 @@ class LLMModel:
         self._answer = None
         self._prompt = None
         self._status = "idle"
+        self._process = psutil.Process()
+        self._init_memory_usage = self._process.memory_info().rss
 
     _status_codes = {
         "not ready": " LLM Wrapper is not able to process prompts",
@@ -32,6 +35,8 @@ class LLMModel:
         "stopping": "LLM Wrapper is in the process of stopping its current LLM",
         "shutdown": "LLM Wrapper is being shut down",
     }
+
+
 
     def download_model(self, attempt=0):
         """
@@ -60,6 +65,8 @@ class LLMModel:
             )
             logging.error(f"{self._status_codes[self._status]}, model = {self.model}")
 
+
+
     def shutdownllm(self):
         """
         discards the llm and sets the wrapper to the same state as after initialization
@@ -69,18 +76,27 @@ class LLMModel:
             return
 
         try:
+            self._status = "stopping"
             del self._pipe
             gc.collect()
             self._pipe = None
-            self._message = None
-            self._answer = None
-            self._prompt = None
-            self._status = "idle"
-            logging.info("shutdown llm")
-            logging.info(f"Status: {self.status} - {self._status_codes[self.status]}")
+            
+            if (self._init_memory_usage * 1.2) < self._process.memory_info().rss: # current resource usage is greater than init usage + 20% than the shutdown wasn't succesfull
+                
+                logging.error(f"“Error when shutting down the llm {self.model}: shutdown wasn't succesfull") 
+                self._status = "failure" 
+            else:
+                self._message = None
+                self._answer = None
+                self._prompt = None
+                self._status = "idle"
+                logging.info("shutdown llm")
+                logging.info(f"Status: {self.status} - {self._status_codes[self.status]}")
         except Exception as e:
             logging.error(f"“Error when shutting down the llm: {e}")
             self._status = "failure"
+
+
 
     def restartllm(self, attempt=0):
         """
@@ -93,18 +109,25 @@ class LLMModel:
             self._status = "failure"
             logging.error(f"failed to restart the llm number of attempts = {attempt}")
             logging.error(
-                f"Status: {self.status} - {self._status_codes[self._status]}, model = {self.model}"
+                f"Status: {self.status} - {self._status_codes[self.status]}, model = {self.model}"
             )
+            return
+        
+        if self.status == "idle":
+            logging.info("Restart not possible, because no LLM is running.")
             return
 
         try:
             logging.info(f"Restarting the llm (attempt {attempt + 1}).")
             self.shutdownllm()
+            self._status = "not ready"
             self.download_model(attempt=attempt)
         except Exception as e:
-            logging.error(f"Error when restarting the llm {e}")
+            logging.error(f"Error when restarting the llm {self.model}, excepion: {e}")
             logging.error(f"Attempt {attempt + 1} failed. New attempt...")
             self.restartllm(attempt=attempt + 1)
+
+
 
     def answer_question(self, question):
         """
@@ -147,6 +170,8 @@ class LLMModel:
             self._answer = output[0]["generated_text"]
 
         return self.answer
+
+
 
     def _isllmresponsive(self):
         """
