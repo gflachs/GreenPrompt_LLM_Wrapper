@@ -13,6 +13,11 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+class RestartError(Exception):
+    def __init__(self, message, errors):
+        super().__init__(message)
+        self.errors = errors
+
 
 class LLMModel:
     def __init__(self, modeltyp, model):
@@ -50,7 +55,7 @@ class LLMModel:
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
-            if await_self._isllmresponsive():
+            if self._isresponsive():
                 self._status = "ready"
                 logging.info(f"{self._status_codes[self.status]}, model = {self.model}")
             else:
@@ -58,7 +63,7 @@ class LLMModel:
                     f"downloaded llm is unresposive try to restart attempt = {attempt + 1}"
                 )
                 if attempt <= 3:
-                    self.restartllm(attempt=attempt + 1)
+                    self.restart(attempt=attempt + 1)
         except Exception as e:
             self._status = "failure"
             logging.error(
@@ -68,7 +73,7 @@ class LLMModel:
 
 
 
-    def shutdownllm(self):
+    def shutdown(self):
         """
         discards the llm and sets the wrapper to the same state as after initialization
         """
@@ -99,7 +104,7 @@ class LLMModel:
 
 
 
-    def restartllm(self, attempt=0):
+    def restart(self, attempt=0):
         """
         Restarts the llm. If unable to restart the llm for instance the llm is unresponsive it will start another attempt.
 
@@ -120,13 +125,13 @@ class LLMModel:
 
         try:
             logging.info(f"Restarting the llm (attempt {attempt + 1}).")
-            self.shutdownllm()
+            self.shutdown()
             self._status = "not ready"
             self.download_model(attempt=attempt)
         except Exception as e:
             logging.error(f"Error when restarting the llm {self.model}, excepion: {e}")
             logging.error(f"Attempt {attempt + 1} failed. New attempt...")
-            self.restartllm(attempt=attempt + 1)
+            self.restart(attempt=attempt + 1)
 
 
 
@@ -174,7 +179,7 @@ class LLMModel:
 
 
 
-    def _isllmresponsive(self):
+    def _isresponsive(self):
         """
         Checks if the model can respond to queries.
         sends a prompt to the downloaded llm and returns true if the llm is returning an answer otherwise returns false
@@ -200,15 +205,7 @@ class LLMModel:
         except Exception as e:
             logging.error(f"Error during model responsiveness check: {e}")
             return False
-        
-    async def monitor_llm(self):
-        while True:
-            if self._status == "ready":
-                if not await self._isllmresponsive():
-                    logging.warning("LLM is unresponsive, attempting to restart.")
-                    await self.restartllm()
-            await asyncio.sleep(60)  # Check every 60 seconds
-        
+
     @property
     def modeltyp(self):
         return self._modeltyp

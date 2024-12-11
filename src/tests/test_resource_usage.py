@@ -18,7 +18,7 @@ class TestLLMModelResourceUsage(unittest.TestCase):
         print(f"Speicherverbrauch nach downlaod: {memory_before_shutdown / 1e6} MB")
 
         # Shutdown
-        llm.shutdownllm()
+        llm.shutdown()
 
         # Memory utilization after shutdown
         memory_after_shutdown = process.memory_info().rss
