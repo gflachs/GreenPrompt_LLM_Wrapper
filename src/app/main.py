@@ -1,6 +1,7 @@
 from src.app.llm_wrapper import LLMWrapper  # Importiere den Wrapper
 import time
 import logging
+import asyncio
 
 logging.basicConfig(
     filename="wrapper.log",
@@ -35,17 +36,18 @@ if __name__ == "__main__":
     try:
         for question in questions:
             logging.info(f"Question: {question}")
-            if wrapper.llm.status == "ready":
-                answer = wrapper.get_answer(question)
-                logging.info(f"Answer: {answer} - Question: {question}")
-            else:
-                logging.warning("Model not ready yet, waiting...")
-                time.sleep(5)  # Warte 5 Sekunden, bevor erneut geprüft wird
-    except RestartError as re:
+            while True:
+                if wrapper.llm.status == "ready":
+                    wrapper.get_answer(question)
+                    break
+                else:
+                    logging.warning("Model not ready yet, waiting...")
+                    asyncio.run(asyncio.sleep(5))  # Warte 5 Sekunden, bevor erneut geprüft wird
+    except LLMWrapper.RestartError as re:
         logging.error(f"LLM failed to restart {re}")
     except Exception as e:
         logging.error(f"Wrapper failed for reasons unknown {e}")
     finally:
         # Führe den Shutdown durch und stoppe das Monitoring
-        wrapper.llm.shutdown()
         wrapper.stop_monitoring()
+        wrapper.llm.shutdown()
