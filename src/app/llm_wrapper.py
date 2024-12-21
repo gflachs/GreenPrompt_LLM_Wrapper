@@ -30,7 +30,7 @@ class LLMWrapper:
 
     def start_monitoring(self):
         """Startet das Health-Monitoring mit schedule."""
-        schedule.every(60).seconds.do(self.health_check_wrapper)  # [Änderung] Verwenden von schedule
+        schedule.every(60).seconds.do(self.health_check_wrapper)  # Verwenden von schedule
 
         while True:
             schedule.run_pending()
