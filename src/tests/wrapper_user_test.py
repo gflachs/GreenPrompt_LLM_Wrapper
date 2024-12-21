@@ -50,4 +50,4 @@ if __name__ == "__main__":
     finally:
         # Führe den Shutdown durch und stoppe das Monitoring
         wrapper.stop_monitoring()
-        wrapper.llm.shutdown()
+        wrapper.shutdown_llm()
