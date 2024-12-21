@@ -94,7 +94,7 @@ class LLMModel:
             logging.error(f"failed to restart the llm after {self._restart_attempt} attempts.")
             return
 
-        if self.status == STATUS_IDLE:
+        if self.status == STATUS_IDLE or self._pipe is None:
             logging.info("Restart not possible, because no LLM is running.")
             return
 
