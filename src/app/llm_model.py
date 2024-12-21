@@ -74,8 +74,8 @@ class LLMModel:
             gc.collect()
             self._pipe = None
 
-            # [Änderung] Erhöht den Grenzwert auf 30% anstatt 20%
-            memory_threshold = self._init_memory_usage * 1.3  # 30% statt 20%
+            # Erhöht den Grenzwert auf 30% anstatt 20%
+            memory_threshold = self._init_memory_usage * 1.3
 
             if self._process.memory_info().rss > memory_threshold:
                 logging.error(f"Shutdown failed: memory usage of {self._process.memory_info().rss / 1e6} MBexceeds the threshold of {memory_threshold / 1e6} MB.")
