@@ -45,9 +45,10 @@ class LLMWrapper:
 
     def health_check_wrapper(self):
         """Health-Check alle 60 Sekunden ausgeführt."""
-        if (time.time() - self._prompting_starting_time) > self._max_timeout:
-            logging.warning("The LLM is unhealthy (dreaming), trying to restart...")
-            self.restart_llm()
+        if self._prompting_starting_time is not None:
+            if (time.time() - self._prompting_starting_time) > self._max_timeout:
+                logging.warning("The LLM is unhealthy (dreaming), trying to restart...")
+                self.restart_llm()
 
         if self.llm.status in [STATUS_READY, STATUS_IDLE, STATUS_NOT_READY]:
             self._is_llm_healthy = True
