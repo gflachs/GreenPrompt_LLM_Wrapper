@@ -59,7 +59,7 @@ class LLMModel:
                 self._restart_attempt = 0
                 logging.info(f"{self._status_codes[self.status]}, model = {self.model}")
             else:
-                self._status = STATUS_NOT_READY  # Status direkt hier setzen
+                self._status = STATUS_NOT_READY 
                 logging.info(f"Downloaded LLM is unresponsive. Status set to '{self.status}'.")
         except Exception as e:
             self._status = STATUS_FAILURE

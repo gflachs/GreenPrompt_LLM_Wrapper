@@ -1,0 +1,13 @@
+{
+    "huggingface_url": "url_to_model",
+    "args": {
+      "prompting": {
+        "temperature": 0.7,
+        "user": "test_user"
+      },
+      "deployment": {
+        "gpu_enabled": true,
+        "batch_size": 8
+      }
+    }
+  }
