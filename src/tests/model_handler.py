@@ -3,7 +3,7 @@ from src.app.llm_model import LLMModel
 # This script is used for terminal-based interaction with the llm_model class 
 # just run it within the terminal with "python model_handler.py"
 
-llm = LLMModel(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+llm = LLMModel(modeltyp="text-generation", model = "openai-community/gpt2")
 llm.download_model()
 
 print("\nHello im a chatbot\n")

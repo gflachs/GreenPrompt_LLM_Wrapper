@@ -20,7 +20,7 @@ if __name__ == "__main__":
     ]
     
     # Erstelle den Wrapper mit den gewünschten Modellparametern
-    wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+    wrapper = LLMWrapper(modeltyp="text-generation", model="mistralai/Mistral-7B-Instruct-v0.2")
     
     # Starte das Health-Monitoring, das den Health-Check alle 60 Sekunden ausführt
     wrapper.start_monitoring()

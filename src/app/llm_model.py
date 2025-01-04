@@ -74,8 +74,8 @@ class LLMModel:
             gc.collect()
             self._pipe = None
 
-            # Erhöht den Grenzwert auf 30% anstatt 20%
-            memory_threshold = self._init_memory_usage * 1.3
+            # Erhöht den Grenzwert auf 40% anstatt 20%
+            memory_threshold = self._init_memory_usage * 1.4
 
             if self._process.memory_info().rss > memory_threshold:
                 logging.error(f"Shutdown failed: memory usage of {self._process.memory_info().rss / 1e6} MBexceeds the threshold of {memory_threshold / 1e6} MB.")
@@ -136,15 +136,16 @@ class LLMModel:
             return
 
         self._message = [{"role": "user", "content": question}]
-        self._prompt = self._pipe.tokenizer.apply_chat_template(self.message, tokenize=False, add_generation_prompt=True)
+        self._prompt = question #self._pipe.tokenizer.apply_chat_template(self.message, tokenize=False, add_generation_prompt=True)
         output = self._pipe(self.prompt, max_new_tokens=256, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
-        parts = output[0]["generated_text"].split("<|assistant|>\n")
-        if len(parts) > 1:
-            self._answer = parts[1]
-        else:
-            self._answer = output[0]["generated_text"]
-
-        return self.answer
+        # parts = output[0]["generated_text"].split(question)
+        parts = output[0]["generated_text"][output[0]["generated_text"].find(question)+len(question):]
+        #if len(parts) > 1:
+        #    self._answer = parts[1]
+        #else:
+        #   self._answer = output[0]["generated_text"]
+        a = parts.strip("\n")
+        return f"output (unstriped): {output} \n\nstripped: {a}"
     
     @property
     def modeltyp(self):
