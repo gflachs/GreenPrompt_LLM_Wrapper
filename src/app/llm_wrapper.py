@@ -36,9 +36,9 @@ def run_continuously(interval=1):
     return cease_continuous_run
 
 class LLMWrapper:
-    def __init__(self, modeltyp, model):
+    def __init__(self, modeltyp:str, model:str, **config_data):
         self._is_llm_healthy = True
-        self.llm = LLMModel(modeltyp=modeltyp, model=model)
+        self.llm = LLMModel(modeltyp=modeltyp, model=model, **config_data)
         self._max_timeout = 240  # Timeout für den Health-Check
         self._continous_task = None
         self._prompting_starting_time = None

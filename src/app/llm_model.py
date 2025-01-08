@@ -24,9 +24,10 @@ class RestartError(Exception):
 
 
 class LLMModel:
-    def __init__(self, modeltyp, model):
+    def __init__(self, modeltyp:str, model:str, **config_data):
         self._modeltyp = modeltyp
         self._model = model
+        self._config_data = config_data
         self._pipe = None
         self._message = None
         self._answer = None
@@ -51,8 +52,8 @@ class LLMModel:
             self._pipe = pipeline(
                 self.modeltyp,
                 model=self.model,
-                torch_dtype=torch.bfloat16,
-                device_map="auto",
+                torch_dtype= self._config_data["torch_dtype"],
+                device_map=self._config_data["device_map"],
             )
             if self._isresponsive():
                 self._status = STATUS_READY
@@ -64,7 +65,7 @@ class LLMModel:
         except Exception as e:
             self._status = STATUS_FAILURE
             logging.error(f"Failed to download the LLM-Model {self.model} because of following Exception: {e}")
-            logging.error(f"{self._status_codes[self._status]}, model = {self.model}")
+            logging.error(f"{self._status_codes[self.status]}, model = {self.model}")
 
     def shutdown(self):
         """Tries to shut down the LLM and check resource usage."""
@@ -135,17 +136,37 @@ class LLMModel:
             logging.info("No LLM in pipe")
             return
 
-        self._message = [{"role": "user", "content": question}]
-        self._prompt = question #self._pipe.tokenizer.apply_chat_template(self.message, tokenize=False, add_generation_prompt=True)
-        output = self._pipe(self.prompt, max_new_tokens=256, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
-        # parts = output[0]["generated_text"].split(question)
-        parts = output[0]["generated_text"][output[0]["generated_text"].find(question)+len(question):]
-        #if len(parts) > 1:
-        #    self._answer = parts[1]
-        #else:
-        #   self._answer = output[0]["generated_text"]
-        a = parts.strip("\n")
-        return f"output (unstriped): {output} \n\nstripped: {a}"
+        if self._config_data["message_template"]:
+            self._message = [{"role": "user", "content": question}]
+            logging.debug("Message Template = True")
+        else:
+            logging.debug("Message Template = False")
+            self.message = question
+        self._prompt = self._pipe.tokenizer.apply_chat_template(self.message, tokenize=False, add_generation_prompt=True)
+        output = self._pipe(
+            self.prompt, 
+            max_new_tokens=self._config_data["max_new_tokens"], 
+            do_sample=self._config_data["do_sample"], 
+            temperature=self._config_data["temperature"], 
+            top_k=self._config_data["top_k"], 
+            top_p=self._config_data["top_p"])
+        
+        parts = output[0]["generated_text"].split("<|assistant|>\n")
+        if len(parts) > 1:
+            self._answer = parts[1]
+        else:
+            self._answer = output[0]["generated_text"]
+        
+        return self.answer
+
+        # # parts = output[0]["generated_text"].split(question)
+        # parts = output[0]["generated_text"][output[0]["generated_text"].find(question)+len(question):]
+        # #if len(parts) > 1:
+        # #    self._answer = parts[1]
+        # #else:
+        # #   self._answer = output[0]["generated_text"]
+        # a = parts.strip("\n")
+        # return f"output (unstriped): {output} \n\nstripped: {a}"
     
     @property
     def modeltyp(self):
