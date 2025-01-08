@@ -1,7 +1,7 @@
 {
   "modeltyp": "text-generation",
-  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-  "uses_chat_template": true,
+  "model": "facebook/opt-125m",
+  "uses_chat_template": false,
   "args": {
       "propmting": {
           "max_new_tokens": 256, 
@@ -10,7 +10,6 @@
           "top_k": 50, 
           "top_p": 0.95},
       "deployment": {
-          "torch_dtype": "torch.bfloat16",
-          "device_map": "auto"}
+          }
   }
 }

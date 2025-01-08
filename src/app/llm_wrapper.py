@@ -36,36 +36,38 @@ def run_continuously(interval=1):
     return cease_continuous_run
 
 class LLMWrapper:
-    def __init__(self, modeltyp:str, model:str, **config_data):
+    def __init__(self, modeltyp:str, model:str, prompting_config:dict, deployment_config:dict, **other_configs):
         self._is_llm_healthy = True
-        self.llm = LLMModel(modeltyp=modeltyp, model=model, **config_data)
+        self.llm = LLMModel(modeltyp=modeltyp, model=model, prompting_config=prompting_config, deployment_config=deployment_config, **other_configs)
         self._max_timeout = 240  # Timeout für den Health-Check
         self._continous_task = None
         self._prompting_starting_time = None
 
     def health_check_wrapper(self):
-        """Health-Check alle 60 Sekunden ausgeführt."""
+        """Health-Check every 60 seconds."""
         if self._prompting_starting_time is not None:
             if (time.time() - self._prompting_starting_time) > self._max_timeout:
-                logging.warning("The LLM is unhealthy (dreaming), trying to restart...")
+                logging.warning("Wrapper: The LLM is unhealthy (dreaming), trying to restart...")
                 self.restart_llm()
 
         if self.llm.status in [STATUS_READY, STATUS_IDLE, STATUS_NOT_READY]:
             self._is_llm_healthy = True
-            logging.info("The LLM is healthy")
+            logging.info("Wrapper: The LLM is healthy")
+            if self._prompting_starting_time is not None:
+                logging.debug(f"Wrapper: trying to answer since {time.time() - self._prompting_starting_time}")
         else: 
             self._is_llm_healthy = False
-            logging.warning("The LLM is unhealthy, trying to restart...")
+            logging.warning("Wrapper: The LLM is unhealthy, trying to restart...")
             self.restart_llm()
 
     def start_monitoring(self):
-        """Startet das Health-Monitoring mit schedule."""
+        """Start health monitoring with schedule."""
         if self._continous_task is None:
             schedule.every(60).seconds.do(self.health_check_wrapper)  # [Änderung] Verwenden von schedule
             self._continous_task = run_continuously()
 
     def stop_monitoring(self):
-        """Beendet das Health-Monitoring."""
+        """Ends health monitoring."""
         if self._continous_task is None:
             return
         self._continous_task.set()
@@ -73,7 +75,7 @@ class LLMWrapper:
 
     def get_answer(self, question):
         self._prompting_starting_time = time.time()
-        logging.info("Task wird ausgeführt...")
+        logging.info("Wrapper: task is being executed...")
         answer = self.llm.answer_question(question)
         logging.info(f"Answer: {answer} - Question: {question}")
         return answer

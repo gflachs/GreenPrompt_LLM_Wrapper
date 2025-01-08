@@ -16,20 +16,29 @@ def load_llm_config(config_path):
             raise ValueError("The JSON-config needs to contain a dictionary.")
 
         # read args and kwargs
-        args = config_data.get("args", [])
-        kwargs = config_data.get("kwargs", {})
+        model = config_data.get("model")
+        modeltyp = config_data.get("modeltyp")
+        uses_chat_template = {"uses_chat_template": config_data.get("uses_chat_template")}
+        args = config_data.get("args", {})
+        prompting_config = args.get("prompting", {})
+        deployment_config = args.get("deployment", {})
+    
 
-        if not isinstance(args, list):
+        if not isinstance(args, dict):
             raise ValueError("The 'args'-key needs to contain a list.")
 
-        if not isinstance(kwargs, dict):
-            raise ValueError("The 'kwargs'-key needs to contain a dictionary.")
+        if not isinstance(prompting_config, dict):
+            raise ValueError("The 'prompting'-key needs to contain a dictionary.")
         
-        if isinstance(kwargs["torch_dtype"], str) and kwargs["torch_dtype"] == "torch.bfloat16":
-            kwargs["torch_dtype"] = torch.bfloat16
+        if not isinstance(deployment_config, dict):
+            raise ValueError("The 'deployment'-key needs to contain a dictionary.")
+        
+        if "torch_dtype" in deployment_config.keys():
+            if isinstance(deployment_config["torch_dtype"], str) and deployment_config["torch_dtype"] == "torch.bfloat16":
+                deployment_config["torch_dtype"] = torch.bfloat16
 
         # call target function (create LLMWrapper with config)
-        return LLMWrapper(*args, **kwargs)
+        return LLMWrapper(model=model, modeltyp=modeltyp, prompting_config=prompting_config, deployment_config=deployment_config, **uses_chat_template)
 
     except FileNotFoundError:
         raise FileNotFoundError(f"The file '{config_path}' wasn`t found.")
@@ -38,12 +47,12 @@ def load_llm_config(config_path):
 
 
 if __name__ == "__main__":
-    config_path = "src/data/test_config.json"
+    config_path = "src/data/config_tinyllama.json"
     wrapper = load_llm_config(config_path)
     wrapper.llm.download_model()
     wrapper.start_monitoring()
 
-    question = "How many people live in the capitol of germany?"
+    question = "Whats the most used currency in China?"
     answer = wrapper.get_answer(question)
     print(answer)
     
