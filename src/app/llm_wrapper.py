@@ -54,7 +54,7 @@ class LLMWrapper:
             self._is_llm_healthy = True
             logging.info("Wrapper: The LLM is healthy")
             if self._prompting_starting_time is not None:
-                logging.debug(f"Wrapper: trying to answer since {time.time() - self._prompting_starting_time}")
+                logging.debug(f"Wrapper: trying to answer since {time.time() - self._prompting_starting_time:.2f} seconds")
         else: 
             self._is_llm_healthy = False
             logging.warning("Wrapper: The LLM is unhealthy, trying to restart...")

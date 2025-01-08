@@ -7,6 +7,22 @@ import schedule
 import src.app.llm_wrapper
 from src.app.llm_model import (STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY)
 from src.app.llm_wrapper import LLMWrapper
+import torch
+
+
+modeltyp =  "text-generation"
+model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+uses_chat_template =  {"uses_chat_template":True}
+
+prompting =  {
+    "max_new_tokens": 256, 
+    "do_sample": True,
+    "temperature": 0.7,
+    "top_k": 50, 
+    "top_p": 0.95}
+deployment = {
+    "torch_dtype": torch.bfloat16,
+    "device_map": "auto"}
 
 
 # global var for counting the number of function calls
@@ -20,7 +36,7 @@ def mock_counter():
 class TestLLMWrapper(unittest.TestCase):
 
     def test_init(self):
-        wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         self.assertTrue(wrapper._is_llm_healthy)
         self.assertIsNotNone(wrapper.llm)
         self.assertEqual(wrapper._max_timeout, 240, "Wrong max_timeout")
@@ -28,7 +44,7 @@ class TestLLMWrapper(unittest.TestCase):
         self.assertIsNone(wrapper._prompting_starting_time)
     
     def test_shutdown_llm(self):
-        wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         wrapper.shutdown_llm()
         wrapper.llm._status = STATUS_READY
         wrapper.shutdown_llm()
@@ -38,7 +54,7 @@ class TestLLMWrapper(unittest.TestCase):
         wrapper.shutdown_llm()
     
     def test_restart_llm(self):
-        wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         wrapper.restart_llm()
         wrapper.llm._status = STATUS_READY
         wrapper.restart_llm()
@@ -48,7 +64,7 @@ class TestLLMWrapper(unittest.TestCase):
         wrapper.restart_llm()
         
     def test_get_answer(self):
-        wrapper = LLMWrapper(modeltyp="text-generation", model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         wrapper.llm.download_model()
 
         math_question = "Whats 17 + 25?"
@@ -63,7 +79,7 @@ class TestLLMWrapper(unittest.TestCase):
         self.assertIn(expected_answer, answer) 
         
     def test_start_monitoring(self):
-        wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         wrapper.start_monitoring()
 
         wrapper._prompting_starting_time = 0

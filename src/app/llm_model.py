@@ -27,7 +27,7 @@ class LLMModel:
     def __init__(self, modeltyp:str, model:str, prompting_config:dict, deployment_config:dict, **other_configs):
         self._modeltyp = modeltyp
         self._model = model
-        self._promting_config = prompting_config
+        self._prompting_config = prompting_config
         self._deployment_config = deployment_config
         self._other_configs = other_configs
         self._pipe = None
@@ -38,6 +38,9 @@ class LLMModel:
         self._process = psutil.Process()
         self._init_memory_usage = self._process.memory_info().rss
         self._restart_attempt = 0
+
+        print(f"prompting_config: {self._prompting_config}")
+        print(f"deployment_config: {self._deployment_config}")
 
     _status_codes = {
         "not ready": "LLM Wrapper is not able to process prompts",
@@ -149,7 +152,7 @@ class LLMModel:
             self._message = question
             self._prompt = self.message
 
-        output = self._pipe(self.prompt, **self._promting_config)
+        output = self._pipe(self.prompt, **self._prompting_config)
         
         parts = output[0]["generated_text"].split("<|assistant|>\n")
         if len(parts) > 1:
