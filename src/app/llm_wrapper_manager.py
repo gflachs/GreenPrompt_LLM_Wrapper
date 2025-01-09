@@ -45,16 +45,3 @@ def load_llm_config(config_path):
     except json.JSONDecodeError:
         raise ValueError(f"The file '{config_path}' doesn`t contain a valid json strucutr.")
 
-
-if __name__ == "__main__":
-    config_path = "src/data/config_tinyllama.json"
-    wrapper = load_llm_config(config_path)
-    wrapper.llm.download_model()
-    wrapper.start_monitoring()
-
-    question = "Whats the most used currency in China?"
-    answer = wrapper.get_answer(question)
-    print(answer)
-    
-    wrapper.stop_monitoring()
-    wrapper.shutdown_llm()
