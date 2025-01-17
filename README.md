@@ -1,4 +1,7 @@
 # Greenprompt LLM Wrapper
+[![Build Status](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/actions/workflows/build.yml/badge.svg)](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/actions/workflows/build.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gflachs_GreenPrompt_LLM_Wrapper&metric=alert_status)](https://sonarcloud.io/dashboard?id=gflachs_GreenPrompt_LLM_Wrapper)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gflachs_GreenPrompt_LLM_Wrapper&metric=coverage)](https://sonarcloud.io/dashboard?id=gflachs_GreenPrompt_LLM_Wrapper)
 
 ## Table of Content
 1. [Purpose](#purpose)

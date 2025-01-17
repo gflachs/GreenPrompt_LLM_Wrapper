@@ -62,7 +62,7 @@ class TestLLMModel(unittest.TestCase):
         self.assertIn(expected_math_answer, math_answer)
         self.assertIn(expected_answer, answer)  
 
-    def test_isresponsive(self):
+
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         self.assertFalse(llm._isresponsive())
         

@@ -39,8 +39,6 @@ class LLMModel:
         self._init_memory_usage = self._process.memory_info().rss
         self._restart_attempt = 0
 
-        print(f"prompting_config: {self._prompting_config}")
-        print(f"deployment_config: {self._deployment_config}")
 
     _status_codes = {
         "not ready": "LLM Wrapper is not able to process prompts",
@@ -71,6 +69,7 @@ class LLMModel:
             logging.error(f"Modell: Failed to download the LLM-Model {self.model} because of following Exception: {e}")
             logging.error(f"Modell: {self._status_codes[self.status]}, model = {self.model}")
 
+
     def shutdown(self):
         """Tries to shut down the LLM and check resource usage."""
         try:
@@ -90,6 +89,7 @@ class LLMModel:
                 logging.info("Modell: Shutdown completed successfully.")
         except Exception as e:
             logging.error(f"Modell: Error during shutdown: {e}")
+
             self._status = STATUS_FAILURE
 
     def restart(self):
@@ -153,23 +153,13 @@ class LLMModel:
             self._prompt = self.message
 
         output = self._pipe(self.prompt, **self._prompting_config)
-        
         parts = output[0]["generated_text"].split("<|assistant|>\n")
         if len(parts) > 1:
             self._answer = parts[1]
         else:
             self._answer = output[0]["generated_text"]
-        
-        return self.answer
 
-        # # parts = output[0]["generated_text"].split(question)
-        # parts = output[0]["generated_text"][output[0]["generated_text"].find(question)+len(question):]
-        # #if len(parts) > 1:
-        # #    self._answer = parts[1]
-        # #else:
-        # #   self._answer = output[0]["generated_text"]
-        # a = parts.strip("\n")
-        # return f"output (unstriped): {output} \n\nstripped: {a}"
+        return self.answer
     
     @property
     def modeltyp(self):
