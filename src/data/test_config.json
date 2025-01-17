@@ -2,7 +2,7 @@
     "modeltyp": "text-generation",
     "model": "microsoft/phi-2",
     "args": {
-        "propmting": {
+        "prompting": {
             "max_new_tokens": 256, 
             "do_sample": true,
             "temperature": 0.7,
