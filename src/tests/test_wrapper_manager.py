@@ -4,7 +4,10 @@ import src.app.llm_wrapper_manager as manager
 class TestWrapperManager(unittest.TestCase):
     def test(self):
         config_path = "src/data/config_tinyllama.json"
-        wrapper = manager.load_llm_config(config_path)
+
+        with open(config_path, 'r') as file:
+            wrapper = manager.WrapperManager().create_wrapper(file)
+        
         wrapper.llm.download_model()
         wrapper.start_monitoring()
 
