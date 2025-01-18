@@ -1,14 +1,21 @@
 import gc
+import gc
 import logging
 import psutil  # for memory monitoring
 
+import psutil  # for memory monitoring
+
 import torch
+import asyncio
 from transformers import pipeline
 
 logging.basicConfig(
     filename="llm.log",
     filemode="w",
+    filename="llm.log",
+    filemode="w",
     level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
@@ -159,15 +166,18 @@ class LLMModel:
         else:
             self._answer = output[0]["generated_text"]
 
+
         return self.answer
     
     @property
     def modeltyp(self):
         return self._modeltyp
 
+
     @property
     def model(self):
         return self._model
+
 
     @property
     def message(self):
