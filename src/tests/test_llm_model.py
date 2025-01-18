@@ -1,6 +1,6 @@
 import unittest
 import time
-from src.app.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_READY, STATUS_NOT_READY
+from src.app.wrapper.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY
 import torch
 
 

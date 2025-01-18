@@ -1,14 +1,13 @@
+import datetime
 import time
 import unittest
-import datetime
 
 import schedule
-
-import src.app.llm_wrapper
-from src.app.llm_model import (STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY)
-from src.app.llm_wrapper import LLMWrapper
 import torch
 
+
+from src.app.wrapper.llm_model import STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY
+from src.app.wrapper.llm_wrapper import LLMWrapper, run_continuously
 
 modeltyp =  "text-generation"
 model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -114,7 +113,7 @@ class TestLLMWrapper(unittest.TestCase):
     def test_scheduler_runs(self):
         """checks rather the scheduled task is performed after the call of run_continuosly"""
         # start the schedular defined in setUp
-        self.cease_event = src.app.llm_wrapper.run_continuously(interval=0.5)
+        self.cease_event = run_continuously(interval=0.5)
 
         time.sleep(3)  # delay to allow mutliple calls within the run_continuosly function
 

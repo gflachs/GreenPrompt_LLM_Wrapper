@@ -1,9 +1,11 @@
 import logging
+import threading
 import time
 
-import schedule  
-import threading
-from src.app.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_READY, STATUS_NOT_READY
+import schedule
+
+from src.app.wrapper.llm_model import (STATUS_FAILURE, STATUS_IDLE,
+                                   STATUS_NOT_READY, STATUS_READY, LLMModel)
 
 logging.basicConfig(
     filename="wrapper.log",
@@ -40,6 +42,7 @@ class LLMWrapper:
     def __init__(self, modeltyp:str, model:str, prompting_config:dict, deployment_config:dict, **other_configs):
         self._is_llm_healthy = True
         self.llm = LLMModel(modeltyp=modeltyp, model=model, prompting_config=prompting_config, deployment_config=deployment_config, **other_configs)
+        self.llm.download_model()
         self._max_timeout = 240  # Timeout für den Health-Check
         self._continous_task = None
         self._prompting_starting_time = None

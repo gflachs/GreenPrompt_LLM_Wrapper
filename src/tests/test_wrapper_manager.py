@@ -1,14 +1,16 @@
 import unittest
-import src.app.llm_wrapper_manager as manager
+import src.app.wrapper.llm_wrapper_manager as manager
+import json
 
 class TestWrapperManager(unittest.TestCase):
     def test_wrapper_creation_with_config(self):
         config_path = "src/data/config_tinyllama.json"
 
         with open(config_path, 'r') as file:
-            wrapper = manager.WrapperManager().create_wrapper(file)
+            json_str = json.dumps(json.load(file))
+            wrapper = manager.WrapperManager().create_wrapper(json_str)
         
-        self.assertEqual(str(type(wrapper)), "<class 'src.app.llm_wrapper.LLMWrapper'>")
+        self.assertEqual(str(type(wrapper)), "<class 'src.app.wrapper.llm_wrapper.LLMWrapper'>")
         wrapper.llm.download_model()
         wrapper.start_monitoring()
 
