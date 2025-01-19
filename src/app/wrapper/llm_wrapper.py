@@ -67,7 +67,7 @@ class LLMWrapper:
     def start_monitoring(self):
         """Start health monitoring with schedule."""
         if self._continous_task is None:
-            schedule.every(60).seconds.do(self.health_check_wrapper)  # [Änderung] Verwenden von schedule
+            schedule.every(60).seconds.do(self.health_check_wrapper)
             self._continous_task = run_continuously()
 
     def stop_monitoring(self):
@@ -94,7 +94,7 @@ class LLMWrapper:
             logging.info("Wrapper ignores shutdown request because no llm is deployed/running")
         elif self.llm.status == STATUS_NOT_READY:
             logging.info("Wrapper ignores shutdown request because llm is already performing a shutdown or a restart")
-
+            self.shutdown_llm()
 
 
     def restart_llm(self):
@@ -106,3 +106,4 @@ class LLMWrapper:
             logging.info("Wrapper ignores restart request because no llm is deployed/running")
         elif self.llm.status == STATUS_NOT_READY:
             logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
+            self.restart_llm()

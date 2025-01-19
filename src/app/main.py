@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Tuple
 
 from fastapi import FastAPI
 
-from app.models.request import ModelConfig, Prompt, PromptResponse
-from app.wrapper.llm_wrapper_manager import WrapperManager
+from src.app.models.request import ModelConfig, Prompt, PromptResponse
+from src.app.wrapper.llm_wrapper_manager import WrapperManager
 
 logging.basicConfig(
     filename="app.log",
@@ -71,7 +71,7 @@ async def deploy(config: ModelConfig):
             logging.error(f"Manager: Error during deployment: {e}")
 
     else:
-        deployment_result = f"Unable to deploy the model {config.model}, because there is already a model deployed. Deployed model: {wrapper.llm.model}"
+        deployment_result = f"Unable to deploy the model {config.model}, because there is already a model deployed."
         response_status = FAILURE
         return {"status": response_status, "message": deployment_result}
     
@@ -93,4 +93,26 @@ async def process_prompt(prompt: Prompt) -> Dict[str, int]:
         question = prompt.question
         answer = wrapper.get_answer(question)
         sci_score = 42 # To be implemented
-    return PromptResponse(answer= answer, sci_score=sci_score)
+    return {"answer": answer, "sci_score": sci_score}
+
+
+@app.post("/shutdown")
+async def shutdown():
+    """Shuts down the currently deployed model if there is one.
+
+    Returns:
+        Dict[str, str]: a dictionary with the response status and message
+    """
+    logging.info("Manager: request shutdown")
+    global wrapper
+
+    if wrapper is None:
+        return {"status": FAILURE, "message": "No model is currently deployed."}
+    
+    try:
+        wrapper.shutdown_llm()
+        wrapper = None
+        return {"status": SUCCESS, "message": "The model has been successfully shut down."}
+    except Exception as e:
+        logging.error(f"Manager: Error during shutdown: {e}")
+        return {"status": FAILURE, "message": "An error occurred during shutdown."}
