@@ -29,6 +29,46 @@ This diagram illustrates the core components and interactions of the LLM Wrapper
 
 ## Setup
 
+Key Dependencies:
+- **torch==2.5.1:** Used for machine learning tasks, especially for building and training models.
+- **transformers==4.46.3:** Utilized for working with transformer models from the Hugging Face library.
+- **psutil==6.1.0:** Provides system and process utilities, helpful for monitoring system resources.
+- **pytest==8.3.3:** Used for running tests to ensure code quality and functionality.
+- **requests==2.32.3:** Simplifies making HTTP requests in Python.
+
+Other Dependencies:
+- accelerate==1.1.1
+- certifi==2024.8.30
+- charset-normalizer==3.4.0
+- colorama==0.4.6
+- coverage==7.6.8
+- filelock==3.16.1
+- fsspec==2024.10.0
+- huggingface-hub==0.26.2
+- idna==3.10
+- iniconfig==2.0.0
+- Jinja2==3.1.4
+- MarkupSafe==3.0.2
+- mpmath==1.3.0
+- networkx==3.4.2
+- numpy==2.1.3
+- packaging==24.2
+- pluggy==1.5.0
+- pysonar-scanner==0.2.0.520
+- pytest-cov==6.0.0
+- PyYAML==6.0.2
+- regex==2024.11.6
+- safetensors==0.4.5
+- schedule==1.2.2
+- setuptools==75.6.0
+- sympy==1.13.1
+- tokenizers==0.20.4
+- toml==0.10.2
+- tqdm==4.67.1
+- typing_extensions==4.12.2
+- urllib3==2.2.3
+
+Install all dependencies from the requirements.txt file using pip:
 ```sh
 pip install -r requirements.txt
 ```
