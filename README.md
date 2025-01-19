@@ -22,6 +22,8 @@ To achieve this, the service will read commands from a file in the file system. 
 
 ### Architecture
 
+This diagram illustrates the core components and interactions of the LLM Wrapper. The wrapper is responsible for managing the lifecycle of an LLM model, including downloading, execution, and evaluation using Green Metrics. It interacts with various components such as the Hugging Face API, the file system, and the LLM itself.
+
 [![Architecture Overview](https://tinyurl.com/2b7fkpak)](https://tinyurl.com/2b7fkpak)<!--![Architecture Overview](./docs/architectur/overview.puml)-->
 
 
