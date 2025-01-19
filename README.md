@@ -6,7 +6,8 @@
 ## Table of Content
 1. [Purpose](#purpose)
 2. [Setup](#setup)
-3. [Contribution](#contribution)
+3. [Codebase Structure](#codebase-structure)
+4. [Contribution](#contribution)
 
 ## Purpose
 
@@ -73,6 +74,30 @@ Install all dependencies from the requirements.txt file using pip:
 pip install -r requirements.txt
 ```
 
+## Codebase Structure
+
+- **[.scannerwork](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/tree/main/.scannerwork):** Used by SonarQube to store analysis reports and other configuration files during code quality and security scans.
+- **[docs/architectur](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/tree/main/docs/architectur):** Stores puml files, that allows you to generate UML diagrams from plain text descriptions.
+- **[.github/workflows/](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/tree/main/.github/workflows):** Contains GitHub Actions workflows for CI/CD.
+  - **[build.yml](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/.github/workflows/build.yml):** Defines the build and test process.
+  - **[plantuml.yml](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/.github/workflows/plantuml.yml):** Processes PlantUML diagrams in Markdown files.
+  - **[sonarcube.yml](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/.github/workflows/sonarcube.yml):** Integrates SonarQube for code quality analysis.
+- **[src](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/tree/main/src):** Contains the source code files.
+   - **[app](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/tree/main/src/app):** Contains the main application logic and modules.
+        - **[llm_model.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/app/llm_model.py):** Defines the LLMModel class, which is responsible for managing the lifecycle of the Language Model (LLM), including downloading the model, checking its responsiveness, answering questions, shutting down, and restarting the model.
+        - **[llm_wrapper.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/app/llm_wrapper.py):** Defines the LLMWrapper class, which wraps around the LLMModel to provide additional functionality such as health monitoring, handling shutdown and restart requests, and ensuring the LLM's readiness and responsiveness.
+   - **[tests]():** Contains unit tests for various functionalities of the project.
+        - **[model_handler.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/tests/model_handler.py):** This script is used for terminal-based interaction with the LLMModel class, allowing users to ask questions to the LLM and receive responses.
+        - **[test_llm_model.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/tests/test_llm_model.py):** This file contains unit tests for the LLMModel class, testing initialization, model downloading, question answering, responsiveness, shutdown, and restart functionalities.
+        - **[test_llm_wrapper.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/tests/test_llm_wrapper.py):** This file includes unit tests for the LLMWrapper class, testing initialization, LLM shutdown, restart, getting answers, and health monitoring functionalities.
+        - **[wrapper_user_test.py](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/src/tests/wrapper_user_test.py):** This script tests the LLMWrapper class in a user-interactive manner, including health monitoring, downloading the model, and answering a series of predefined questions.
+- **[.gitignore](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/.gitignore):** Specifies files and directories that should be ignored by Git in order to avoid committing them to the repository.
+- **[LICENSE](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/LICENSE):** Contains the MIT License text, granting permission to use, copy, modify, and distribute the software.
+- **[README.md](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/README.md):** Provides an overview of the project, setup instructions, and contribution guidelines.
+- **[pytest.ini](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/pytest.ini):** Configuration file for pytest, specifying the paths to test modules and other settings.
+- **[requirements.txt](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/requirements.txt):** Lists the dependencies required for the project, which can be installed using pip.
+- **[sonar-project.properties](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/sonar-project.properties):** Configuration file for SonarQube, specifying project details and paths for source files, tests, and coverage reports.
+  
 ## Contribution
 
 Thank you for your interest in contributing to our project! To ensure the quality and consistency of our code, we kindly ask you to follow these guidelines.
