@@ -78,23 +78,24 @@ class TestLLMWrapper(unittest.TestCase):
         self.assertIn(expected_answer, answer) 
         
     def test_start_monitoring(self):
-        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
-        wrapper.start_monitoring()
+        try: 
+            wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
+            wrapper.start_monitoring()
 
-        wrapper._prompting_starting_time = 0
-        time.sleep(70)
-        self.assertTrue(wrapper._is_llm_healthy)
+            wrapper._prompting_starting_time = 0
+            time.sleep(70)
+            self.assertTrue(wrapper._is_llm_healthy)
 
-        wrapper._prompting_starting_time = None
-        wrapper.llm._status = STATUS_FAILURE
-        time.sleep(70)
-        self.assertFalse(wrapper._is_llm_healthy, msg= f"failed at {datetime.datetime.now()}")
+            wrapper._prompting_starting_time = None
+            wrapper.llm._status = STATUS_FAILURE
+            time.sleep(70)
+            self.assertFalse(wrapper._is_llm_healthy, msg= f"failed at {datetime.datetime.now()}")
 
-        wrapper.llm._status = STATUS_READY
-        time.sleep(70)
-        self.assertTrue(wrapper._is_llm_healthy)
+            wrapper.llm._status = STATUS_READY
+            time.sleep(70)
+            self.assertTrue(wrapper._is_llm_healthy)
 
-        wrapper.stop_monitoring() 
+        finally: wrapper.stop_monitoring() 
 
     def setUp(self):
         """init the test_schedular_runs (is called befor each test but only necessary for test_schedular_runs)"""
