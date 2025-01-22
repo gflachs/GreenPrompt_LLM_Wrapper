@@ -1,0 +1,15 @@
+{
+  "modeltyp": "text-generation",
+  "model": "facebook/opt-125m",
+  "uses_chat_template": false,
+  "args": {
+      "prompting": {
+          "max_new_tokens": 256, 
+          "do_sample": true,
+          "temperature": 0.7,
+          "top_k": 50, 
+          "top_p": 0.95},
+      "deployment": {
+          }
+  }
+}

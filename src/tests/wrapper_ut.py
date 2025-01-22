@@ -1,3 +1,4 @@
+import torch
 from src.app.llm_wrapper import LLMWrapper  # Importiere den Wrapper
 import time
 import logging
@@ -11,6 +12,21 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
+    modeltyp =  "text-generation"
+    model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+    uses_chat_template =  {"uses_chat_template":True}
+
+    prompting =  {
+        "max_new_tokens": 256, 
+        "do_sample": True,
+        "temperature": 0.7,
+        "top_k": 50, 
+        "top_p": 0.95}
+    deployment = {
+        "torch_dtype": torch.bfloat16,
+        "device_map": "auto"}
+    
+    
     questions = [
         "What's the capital of France?",
         "How much does a litre of water weigh?",
@@ -20,7 +36,7 @@ if __name__ == "__main__":
     ]
     
     # Erstelle den Wrapper mit den gewünschten Modellparametern
-    wrapper = LLMWrapper(modeltyp="text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+    wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
     
     # Starte das Health-Monitoring, das den Health-Check alle 60 Sekunden ausführt
     wrapper.start_monitoring()
