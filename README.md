@@ -7,72 +7,7 @@
 1. [Purpose](#purpose)
 2. [Setup](#setup)
 3. [Contribution](#contribution)
-
-## How To Use it
-
-### open a terminal and navigate to the App folder (or in vs code right click on the App folder and open in integrated Terminal)
-# Enter the following command in the terminal
-fastapi dev main.py
-
-
-
-### Leave terminal open and open second terminal
-# Execute the following terminal commands one after the other, what the app does should be visible in the first terminal and in the log  
-
-### Aufruf um die get_status Methode zu testen 
-Invoke-WebRequest -Uri "http://127.0.0.1:8000/get_status" -Method GET
-curl -X GET http://127.0.0.1:8000/get_status
-
-
-### Call to test the get_status method 
-
-# Define the target URL
-$uri = "http://127.0.0.1:8000/deploy"  
-
-# Define the JSON body
-$body = @{
-    modeltyp = "text-generation"
-    model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-    uses_chat_template = $true
-    args = @{
-        prompting = @{
-            max_new_tokens = 256
-            do_sample = $true
-            temperature = 0.7
-            top_k = 50
-            top_p = 0.95
-        }
-        deployment = @{
-            torch_dtype = "torch.bfloat16"
-            device_map = "auto"
-        }
-    }
-} | ConvertTo-Json -Depth 10  # Convert to JSON with sufficient depth
-
-# Perform the POST request
-$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
-
-# Output the response
-$response.Content
-
-
-
-### Aufruf um die process_prompt Methode zu testen
-
-# Define the API endpoint
-$uri = "http://127.0.0.1:8000/process_prompt"  
-
-# Define the JSON body
-$body = @{
-    question = "What is the capital of France?"
-} | ConvertTo-Json -Depth 10  # Convert the hashtable to JSON format
-
-# Perform the POST request
-$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
-
-# Output the response content
-$response.Content
-
+4. [UserInstruction](#hotouseit)
 
 ## Purpose
 
@@ -147,3 +82,66 @@ Thank you for your interest in contributing to our project! To ensure the qualit
 ### Summary
 
 With these guidelines, we aim to ensure that the code remains easy to read and maintain for all team members. We greatly appreciate your contributions and look forward to your Pull Requests!
+
+
+# UserInstruction
+open a terminal and navigate to the App folder (or in vs code right click on the App folder and open in integrated Terminal)
+
+## Enter the following command in the terminal
+fastapi dev main.py
+
+## Leave terminal open and open second terminal - Execute the following terminal commands one after the other, what the app does should be visible in the first terminal and in the log  
+
+## Aufruf um die get_status Methode zu testen 
+Invoke-WebRequest -Uri "http://127.0.0.1:8000/get_status" -Method GET
+curl -X GET http://127.0.0.1:8000/get_status
+
+
+## Call to test the get_status method 
+
+## Define the target URL
+$uri = "http://127.0.0.1:8000/deploy"  
+
+## Define the JSON body
+$body = @{
+    modeltyp = "text-generation"
+    model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+    uses_chat_template = $true
+    args = @{
+        prompting = @{
+            max_new_tokens = 256
+            do_sample = $true
+            temperature = 0.7
+            top_k = 50
+            top_p = 0.95
+        }
+        deployment = @{
+            torch_dtype = "torch.bfloat16"
+            device_map = "auto"
+        }
+    }
+} | ConvertTo-Json -Depth 10  # Convert to JSON with sufficient depth
+
+## Perform the POST request
+$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
+
+## Output the response
+$response.Content
+
+
+
+### Aufruf um die process_prompt Methode zu testen
+
+# Define the API endpoint
+$uri = "http://127.0.0.1:8000/process_prompt"  
+
+## Define the JSON body
+$body = @{
+    question = "What is the capital of France?"
+} | ConvertTo-Json -Depth 10  # Convert the hashtable to JSON format
+
+# Perform the POST request
+$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
+
+## Output the response content
+$response.Content
