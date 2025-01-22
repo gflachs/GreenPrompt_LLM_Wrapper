@@ -82,7 +82,7 @@ def test_deploy_with_existing_wrapper():
         
         response = client.post("/deploy", json=config_data)
         
-        expected_message = f"Unable to deploy the model new-model, because there is already a model deployed."
+        expected_message = "Unable to deploy the model new-model, because there is already a model deployed."
         
         assert response.status_code == 200
         assert response.json() == {

@@ -48,7 +48,6 @@ class TestLLMModel(unittest.TestCase):
 
     def test_download_model(self):
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         self.assertIsNone(llm._pipe)
         self.assertEqual(llm.status, STATUS_NOT_READY)
 
@@ -57,7 +56,6 @@ class TestLLMModel(unittest.TestCase):
         self.assertEqual(llm.status, STATUS_READY)
         
     def test_answer_question(self):
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm.download_model()
 
@@ -74,8 +72,6 @@ class TestLLMModel(unittest.TestCase):
 
 
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
-
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         self.assertFalse(llm._isresponsive())
         
         llm.download_model()
@@ -83,13 +79,11 @@ class TestLLMModel(unittest.TestCase):
         
     def test_isresponsive_unresponsive(self):
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm.download_model()
         llm.answer_question = lambda x: None 
         self.assertFalse(llm._isresponsive())
 
     def test_shutdown(self):
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm.shutdown()
         self.assertEqual(llm.status, STATUS_IDLE)
@@ -107,7 +101,6 @@ class TestLLMModel(unittest.TestCase):
                              f"Shutdown performance test failed: elapsed time {elapsed_time:.2f}s exceeds {max_allowed_time:.2f}s")
 
     def test_restart(self):
-        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         llm.restart()
         self.assertEqual(llm.status, STATUS_NOT_READY)
