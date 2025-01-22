@@ -96,7 +96,70 @@ pip install -r requirements.txt
 - **[pytest.ini](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/pytest.ini):** Configuration file for pytest, specifying the paths to test modules and other settings.
 - **[requirements.txt](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/requirements.txt):** Lists the dependencies required for the project, which can be installed using pip.
 - **[sonar-project.properties](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/blob/main/sonar-project.properties):** Configuration file for SonarQube, specifying project details and paths for source files, tests, and coverage reports.
-  
+
+## API Endpoints
+
+### Endpoint: /get_status
+- Method: GET
+- Description: This endpoint returns the status of the LLM model or STATUS_IDLE if no wrapper is deployed.
+- Response:
+   - status: Indicates the status of the request (success).
+   - message: Contains the current status of the LLM model or STATUS_IDLE if no wrapper is deployed.
+- Example Response:
+```sh
+{
+  "status": "success",
+  "message": "ready"
+}
+```
+
+### Endpoint: /deploy
+- Method: POST
+- Description: This endpoint is used to deploy a wrapper and initialize the LLM model defined within the configuration.
+- Request:
+   - config: A JSON object that fulfills the requirements of the ModelConfig schema.
+- Response: tbd
+- Example Response:
+```sh
+{
+  "model": "example_model",
+  "parameters": {
+    "param1": "value1",
+    "param2": "value2"
+  }
+}
+```
+
+### Endpoint: /process_prompt
+- Method: POST
+- Description: This endpoint processes an input prompt and returns a response.
+- Request:
+   - prompt: A JSON object that contains the input prompt. The object should conform to the Prompt schema.
+- Response: A JSON object that contains the result of processing the prompt. The object should conform to the PromptResponse schema.
+- Example Request:
+```sh
+{"prompt": "What is the capital of France?"}
+```
+- Example Response:
+```sh
+{"response": "The capital of France is Paris."}
+```
+
+### Endpoint: /shutdown
+- Method: POST
+- Description: This endpoint is used to shut down the LLM wrapper.
+- Request:
+   - prompt: A JSON object that contains the input prompt. The object should conform to the Prompt schema.
+- Response: A dictionary with the response status and message.
+- Example Response:
+```sh
+{
+  "status": "success",
+  "message": "The LLM wrapper has been shut down."
+}
+```
+
+
 ## Contribution
 
 Thank you for your interest in contributing to our project! To ensure the quality and consistency of our code, we kindly ask you to follow these guidelines.
