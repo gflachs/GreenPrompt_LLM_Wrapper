@@ -257,3 +257,9 @@ curl -X POST http://127.0.0.1:8000/deploy -H "Content-Type: application/json" -d
 curl -X POST http://127.0.0.1:8000/process_prompt -H "Content-Type: application/json" -d '{"prompt": "What is the capital of France?"}'
 
 ```
+
+----------
+
+This README is designed to be comprehensive yet beginner-friendly. Feedback is always welcome to make further improvements!
+
+
