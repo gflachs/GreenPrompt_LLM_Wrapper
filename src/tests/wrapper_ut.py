@@ -1,5 +1,5 @@
 import torch
-from src.app.llm_wrapper import LLMWrapper  # Importiere den Wrapper
+from src.app.wrapper.llm_wrapper import LLMWrapper  # Importiere den Wrapper
 import time
 import logging
 import asyncio

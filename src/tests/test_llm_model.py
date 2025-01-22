@@ -1,6 +1,6 @@
 import unittest
 import time
-from src.app.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_READY, STATUS_NOT_READY
+from src.app.wrapper.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY
 import torch
 
 
@@ -24,8 +24,13 @@ class TestLLMModel(unittest.TestCase):
     def test_init(self):
         llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
         print(llm._other_configs)
+        llm = LLMModel(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
+        print(llm._other_configs)
         self.assertEqual(llm.modeltyp, "text-generation")
         self.assertEqual(llm.model, "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+        self.assertEqual(llm._prompting_config, prompting)
+        self.assertEqual(llm._deployment_config, deployment)
+        
         self.assertEqual(llm._prompting_config, prompting)
         self.assertEqual(llm._deployment_config, deployment)
         
@@ -34,6 +39,9 @@ class TestLLMModel(unittest.TestCase):
         self.assertIsNone(llm.answer)
         self.assertIsNone(llm._prompt)
         self.assertEqual(llm.status, STATUS_NOT_READY)
+        self.assertIsNotNone(llm._process)
+        self.assertGreater(llm._init_memory_usage, 0)
+        self.assertEqual(llm._restart_attempt, 0)
         self.assertIsNotNone(llm._process)
         self.assertGreater(llm._init_memory_usage, 0)
         self.assertEqual(llm._restart_attempt, 0)

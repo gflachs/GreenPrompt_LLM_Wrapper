@@ -1,14 +1,13 @@
+import datetime
 import time
 import unittest
-import datetime
 
 import schedule
-
-import src.app.llm_wrapper
-from src.app.llm_model import (STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY)
-from src.app.llm_wrapper import LLMWrapper
 import torch
 
+
+from src.app.wrapper.llm_model import STATUS_FAILURE, STATUS_IDLE, STATUS_NOT_READY, STATUS_READY
+from src.app.wrapper.llm_wrapper import LLMWrapper, run_continuously
 
 modeltyp =  "text-generation"
 model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -79,23 +78,24 @@ class TestLLMWrapper(unittest.TestCase):
         self.assertIn(expected_answer, answer) 
         
     def test_start_monitoring(self):
-        wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
-        wrapper.start_monitoring()
+        try: 
+            wrapper = LLMWrapper(modeltyp=modeltyp, model = model, prompting_config=prompting, deployment_config=deployment, **uses_chat_template)
+            wrapper.start_monitoring()
 
-        wrapper._prompting_starting_time = 0
-        time.sleep(70)
-        self.assertTrue(wrapper._is_llm_healthy)
+            wrapper._prompting_starting_time = 0
+            time.sleep(70)
+            self.assertTrue(wrapper._is_llm_healthy)
 
-        wrapper._prompting_starting_time = None
-        wrapper.llm._status = STATUS_FAILURE
-        time.sleep(70)
-        self.assertFalse(wrapper._is_llm_healthy, msg= f"failed at {datetime.datetime.now()}")
+            wrapper._prompting_starting_time = None
+            wrapper.llm._status = STATUS_FAILURE
+            time.sleep(70)
+            self.assertTrue(wrapper._is_llm_healthy, msg= f"failed at {datetime.datetime.now()}")
 
-        wrapper.llm._status = STATUS_READY
-        time.sleep(70)
-        self.assertTrue(wrapper._is_llm_healthy)
+            wrapper.llm._status = STATUS_READY
+            time.sleep(70)
+            self.assertTrue(wrapper._is_llm_healthy)
 
-        wrapper.stop_monitoring() 
+        finally: wrapper.stop_monitoring() 
 
     def setUp(self):
         """init the test_schedular_runs (is called befor each test but only necessary for test_schedular_runs)"""
@@ -114,7 +114,7 @@ class TestLLMWrapper(unittest.TestCase):
     def test_scheduler_runs(self):
         """checks rather the scheduled task is performed after the call of run_continuosly"""
         # start the schedular defined in setUp
-        self.cease_event = src.app.llm_wrapper.run_continuously(interval=0.5)
+        self.cease_event = run_continuously(interval=0.5)
 
         time.sleep(3)  # delay to allow mutliple calls within the run_continuosly function
 

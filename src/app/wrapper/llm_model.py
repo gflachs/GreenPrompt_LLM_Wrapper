@@ -1,8 +1,7 @@
 import gc
 import logging
-import psutil  # for memory monitoring
 
-import torch
+import psutil  # for memory monitoring
 from transformers import pipeline
 
 logging.basicConfig(
@@ -159,15 +158,18 @@ class LLMModel:
         else:
             self._answer = output[0]["generated_text"]
 
+
         return self.answer
     
     @property
     def modeltyp(self):
         return self._modeltyp
 
+
     @property
     def model(self):
         return self._model
+
 
     @property
     def message(self):

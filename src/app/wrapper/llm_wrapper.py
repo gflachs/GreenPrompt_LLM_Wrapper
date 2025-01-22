@@ -1,9 +1,11 @@
 import logging
+import threading
 import time
 
-import schedule  
-import threading
-from src.app.llm_model import LLMModel, STATUS_FAILURE, STATUS_IDLE, STATUS_READY, STATUS_NOT_READY
+import schedule
+
+from src.app.wrapper.llm_model import (STATUS_FAILURE, STATUS_IDLE,
+                                   STATUS_NOT_READY, STATUS_READY, LLMModel)
 
 logging.basicConfig(
     filename="wrapper.log",
@@ -40,9 +42,11 @@ class LLMWrapper:
     def __init__(self, modeltyp:str, model:str, prompting_config:dict, deployment_config:dict, **other_configs):
         self._is_llm_healthy = True
         self.llm = LLMModel(modeltyp=modeltyp, model=model, prompting_config=prompting_config, deployment_config=deployment_config, **other_configs)
+        self.llm.download_model()
         self._max_timeout = 240  # Timeout für den Health-Check
         self._continous_task = None
         self._prompting_starting_time = None
+        self._is_restarting_or_shutdown = False
 
     def health_check_wrapper(self):
         """Health-Check every 60 seconds."""
@@ -56,6 +60,8 @@ class LLMWrapper:
             logging.info("Wrapper: The LLM is healthy")
             if self._prompting_starting_time is not None:
                 logging.debug(f"Wrapper: trying to answer since {time.time() - self._prompting_starting_time:.2f} seconds")
+            if self.llm.status == STATUS_READY:
+                self._is_restarting_or_shutdown = False
         else: 
             self._is_llm_healthy = False
             logging.warning("Wrapper: The LLM is unhealthy, trying to restart...")
@@ -64,7 +70,7 @@ class LLMWrapper:
     def start_monitoring(self):
         """Start health monitoring with schedule."""
         if self._continous_task is None:
-            schedule.every(60).seconds.do(self.health_check_wrapper)  # [Änderung] Verwenden von schedule
+            schedule.every(60).seconds.do(self.health_check_wrapper)
             self._continous_task = run_continuously()
 
     def stop_monitoring(self):
@@ -84,22 +90,34 @@ class LLMWrapper:
     
     def shutdown_llm(self):
         if self.llm.status == STATUS_READY:
+            self._is_restarting_or_shutdown = True
             self.llm.shutdown()
         elif self.llm.status == STATUS_FAILURE:
             logging.info("Wrapper ignores shutdown request because llm is in failure state")
         elif self.llm.status == STATUS_IDLE:
             logging.info("Wrapper ignores shutdown request because no llm is deployed/running")
         elif self.llm.status == STATUS_NOT_READY:
-            logging.info("Wrapper ignores shutdown request because llm is already performing a shutdown or a restart")
-
+            if self._is_restarting_or_shutdown:
+                logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
+            else:
+                self._is_restarting_or_shutdown = True
+                self.llm.shutdown()
 
 
     def restart_llm(self):
         if self.llm.status == STATUS_READY:
+            self._is_restarting_or_shutdown = True
             self.llm.restart()
         elif self.llm.status == STATUS_FAILURE:
-            logging.info("Wrapper ignores restart request because llm is in failure state")
+            if self._is_restarting_or_shutdown:
+                logging.info("Wrapper ignores restart request because llm is in failure state")
+            else:
+                self.llm.restart()
         elif self.llm.status == STATUS_IDLE:
             logging.info("Wrapper ignores restart request because no llm is deployed/running")
         elif self.llm.status == STATUS_NOT_READY:
-            logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
+            if self._is_restarting_or_shutdown:
+                logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
+            else:
+                self._is_restarting_or_shutdown = True
+                self.llm.restart()
