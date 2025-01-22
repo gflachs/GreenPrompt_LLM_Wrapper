@@ -90,7 +90,7 @@ class LLMWrapper:
     
     def shutdown_llm(self):
         if self.llm.status == STATUS_READY:
-            self._is
+            self._is_restarting_or_shutdown = True
             self.llm.shutdown()
         elif self.llm.status == STATUS_FAILURE:
             logging.info("Wrapper ignores shutdown request because llm is in failure state")
@@ -100,6 +100,7 @@ class LLMWrapper:
             if self._is_restarting_or_shutdown:
                 logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
             else:
+                self._is_restarting_or_shutdown = True
                 self.llm.shutdown()
 
 
@@ -108,11 +109,15 @@ class LLMWrapper:
             self._is_restarting_or_shutdown = True
             self.llm.restart()
         elif self.llm.status == STATUS_FAILURE:
-            logging.info("Wrapper ignores restart request because llm is in failure state")
+            if self._is_restarting_or_shutdown:
+                logging.info("Wrapper ignores restart request because llm is in failure state")
+            else:
+                self.llm.restart()
         elif self.llm.status == STATUS_IDLE:
             logging.info("Wrapper ignores restart request because no llm is deployed/running")
         elif self.llm.status == STATUS_NOT_READY:
             if self._is_restarting_or_shutdown:
                 logging.info("Wrapper ignores restart request because llm is already performing a shutdown or a restart")
             else:
+                self._is_restarting_or_shutdown = True
                 self.llm.restart()
