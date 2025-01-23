@@ -5,14 +5,14 @@
 
 ## Table of Contents
 
-1.  [Purpose](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#purpose)
-2.  [Architecture](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#architecture)
-3.  [Setup](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#setup)
-4.  [Codebase Structure](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#codebase-structure)
-5.  [API Endpoints](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#api-endpoints)
-6.  [SCI-Score](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#sci-score)
-7.  [Contribution Guidelines](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#contribution-guidelines)
-8.  [User Instructions](https://chatgpt.com/c/67916722-07b4-800b-a8fe-8311e1a24686#user-instructions)
+1.  [Purpose]
+2.  [Architecture]
+3.  [Setup]
+4.  [Codebase Structure]
+5.  [API Endpoints]
+6.  [SCI-Score]
+7.  [Contribution Guidelines]
+8.  [User Instructions]
 
 ----------
 
