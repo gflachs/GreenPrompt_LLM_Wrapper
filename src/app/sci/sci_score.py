@@ -1,8 +1,5 @@
 import re
 import subprocess
-import time
-
-import pyRAPL
 
 # Globale Variable zur Speicherung der Messdaten
 
