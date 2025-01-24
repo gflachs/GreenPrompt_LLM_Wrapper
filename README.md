@@ -1,147 +1,216 @@
-# Greenprompt LLM Wrapper
-[![Build Status](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/actions/workflows/build.yml/badge.svg)](https://github.com/gflachs/GreenPrompt_LLM_Wrapper/actions/workflows/build.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gflachs_GreenPrompt_LLM_Wrapper&metric=alert_status)](https://sonarcloud.io/dashboard?id=gflachs_GreenPrompt_LLM_Wrapper)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gflachs_GreenPrompt_LLM_Wrapper&metric=coverage)](https://sonarcloud.io/dashboard?id=gflachs_GreenPrompt_LLM_Wrapper)
+# Software Carbon Intensity (SCI) Calculation Tool
 
-## Table of Content
-1. [Purpose](#purpose)
-2. [Setup](#setup)
-3. [Contribution](#contribution)
-4. [UserInstruction](#hotouseit)
+Welcome to the **Software Carbon Intensity (SCI) Calculation Tool**! This simple command-line program estimates the carbon footprint of your software by calculating its **SCI score**, a metric reflecting the greenhouse gas emissions (in grams of CO₂) per functional unit of your software’s output.
 
-## Purpose
+## Table of Contents
 
-This service is responsible for managing the lifecycle of a specified LLM. The LLM will be downloaded from Huggingface. The service deploys the LLM and manages the lifecycle of the LLM. The service will be responsible for the following:
-- Downloading the LLM from Huggingface
-- Deploying the LLM
-- Managing the lifecycle of the LLM
-- Sending prompts to the LLM
-- Receiving responses from the LLM
-- Measuring the SCI Score of the LLM
+1.  [What is SCI?](#what-is-sci)
+2.  [Overview of Our Approach](#overview-of-our-approach)
+3.  [How It Works](#how-it-works)
+4.  [Requirements](#requirements)
+5.  [How to Use](#how-to-use)
+6.  [Detailed Steps](#detailed-steps)
+    -   [1) CPU Energy (E)](#1-cpu-energy-e)
+    -   [2) Carbon Intensity (I)](#2-carbon-intensity-i)
+    -   [3) Hardware Carbon (M)](#3-hardware-carbon-m)
+    -   [4) Result Metric (R)](#4-result-metric-r)
+    -   [5) SCI Formula](#5-sci-formula)
+7.  [Interpreting the Log File](#interpreting-the-log-file)
+8.  [Limitations & Disclaimer](#limitations--disclaimer)
+9.  [Further Improvements](#further-improvements)
 
-To achieve this, the service will read commands from a file in the file system. The service will read the commands from the file and execute the commands. The service will write the output of the commands ( meas the resulting state of the LLM) to a file in the file system. The service will also write the SCI Score of the LLM to a file in the file system.
+----------
 
-### Architecture
+## What is SCI?
 
-[![Architecture Overview](https://tinyurl.com/2b7fkpak)](https://tinyurl.com/2b7fkpak)<!--![Architecture Overview](./docs/architectur/overview.puml)-->
+**Software Carbon Intensity (SCI)** is a methodology proposed by the Green Software Foundation. The goal is to quantify how much greenhouse gas emissions your software generates **per unit of work** it performs. By having a numeric indicator, you can track, compare, and optimize the carbon footprint of your software over time.
 
+The general formula is:
 
-## Setup
+SCI=(E×I)+MR\text{SCI} = \frac{(E \times I) + M}{R}SCI=R(E×I)+M​
 
-```sh
-pip install -r requirements.txt
-```
+where:
 
-## Contribution
+-   E = Energy consumed (kWh)
+-   I= Carbon intensity of the energy (gCO₂/kWh)
+-   M = Hardware (embodied) carbon emissions (gCO₂)
+-   R = Result metric (e.g., number of requests, number of tasks, etc.)
 
-Thank you for your interest in contributing to our project! To ensure the quality and consistency of our code, we kindly ask you to follow these guidelines.
+----------
 
-### Branch Protection
+## Overview of Our Approach
 
-- All changes must be made through **Pull Requests**.
-- We have **branch protection**: at least **one review** from another person is required before changes can be merged.
-- All **checks must pass** before a merge is allowed.
-- Make sure your branch is **up to date** with the target branch to avoid merge conflicts.
+We use a **simplified method** to calculate the SCI in this tool:
 
-### Code Quality
+1.  **Estimate CPU Energy Usage (E)** by monitoring CPU utilization and multiplying by a “nominal power” (TPW/RPW/TDP) over a chosen duration.
+2.  **Determine Carbon Intensity (I)** by either asking for the user’s country and using an approximate value, or defaulting to a generic average.
+3.  **Compute Hardware Carbon (M)** by simply doing M=E×IM = E \times IM=E×I. This follows a suggestion that hardware footprint can be represented by the same “energy multiplied by intensity” approach. (In reality, embodied carbon is more complex, but we keep it simple here.)
+4.  **Ask for a Result Metric (R)** such as the number of transactions or requests handled.
+5.  **Calculate the SCI** as (E×I)+MR\frac{(E \times I) + M}{R}R(E×I)+M​.
 
-- **Linting and code quality** must meet the defined standards. We use tools like **flake8** (Python) or similar linters to ensure the code is clean and readable.
-- Use **pre-commit hooks** to check compliance with the standards before committing your code.
+Finally, we **log** these details (time of measurement, inputs, and final SCI) to a `.log` file.
 
-### No New Bugs
+----------
 
-- Ensure that your code does not introduce **new errors**. Run all relevant **unit tests** and extend the test suite if necessary.
-- Make sure that **existing tests do not fail**. New changes must not affect existing functionality.
+## How It Works
 
-### Tests
+1.  The script **prompts** for input:
+    
+    -   CPU nominal power (e.g., TDP in Watts)
+    -   Duration of the software run (in seconds)
+    -   Location (country code) to pick an approximate grid carbon intensity (gCO₂/kWh)
+    -   How many requests or results were handled (the denominator RRR)
+2.  The script **measures** CPU usage in real time (using the [psutil](https://pypi.org/project/psutil/) Python library) and calculates the estimated CPU energy consumption in kWh.
+    
+3.  The script **calculates**:
+    
+    -   **I**: carbon intensity for the region.
+    -   **M**: hardware carbon, estimated as E×IE \times IE×I.
+4.  It then **computes** the SCI = (E×I)+MR\frac{(E \times I) + M}{R}R(E×I)+M​.
+    
+5.  It **writes** these results (including the SCI score) to `sci_score.log`.
+    
 
-- Each new feature should be covered with appropriate **unit tests** or **integration tests** (minimum coverage 70%).
-- Run all tests to ensure that existing functionality is not affected.
+----------
 
-### Documentation
+## Requirements
 
-- All changes to the code should be documented in **comments** and/or in the **README.md**, if they affect usage.
-- Clearly explain **why** you made the changes so that other developers can understand the motivation behind them.
+-   **Python 3.x**
+-   **psutil** library installed.
+    -   Installation:
+        
+        bash
+        
+        Copier
+        
+        `pip install psutil` 
+        
+-   A terminal or command prompt to run the script.
 
-### Pull Request (PR) Description
+----------
 
-- Each PR should contain a **clear description** of the changes made.
-- Explain why the change is necessary and what problem it solves.
-- Reference relevant **issues** (e.g., `Fixes #123`) if available.
+## How to Use
 
-### Style Guidelines
+1.  **Clone or download** this repository (or just save the `main.py` file  in the folder sci ).
+    
+2.  **Install psutil** if not already installed.
+    
+3.  **Run the script** from your terminal:
+    
+    bash
+    
+    Copier
+    
+    `python main.py` 
+    
+4.  **Answer the prompts**:
+    
+    -   CPU nominal power (Watts), e.g. `65`
+    -   Duration (in seconds), e.g. `10`
+    -   Country code, e.g. `DE` for Germany
+    -   Number of results (e.g., `1000` requests)
+5.  **Check the output** displayed in the terminal. The SCI score will be printed at the end.
+    
+6.  **Open** the `sci_score.log` file (created or appended each time you run the script) to see a detailed record of inputs and the final SCI score.
+    
 
-- Follow the established **code conventions** (e.g., PEP8 for Python code).
-- Ensure that your code adheres to the project's style guidelines.
+----------
 
-### Feedback and Reviews
+## Detailed Steps
 
-- Be open to **feedback**. Reviews are part of the process to ensure the quality of the code.
-- Take the time to respond to comments and make necessary changes.
+### 1) CPU Energy (E)
 
-### Summary
+We do not have direct access to hardware counters like Intel RAPL in this script, so we **estimate** the CPU energy usage by:
 
-With these guidelines, we aim to ensure that the code remains easy to read and maintain for all team members. We greatly appreciate your contributions and look forward to your Pull Requests!
+1.  Monitoring CPU usage (in %) each second over a given duration.
+2.  Assuming the CPU consumes power proportional to its nominal power rating (TPW/RPW/TDP) times the observed usage fraction.
+3.  Multiplying by the measurement time (in hours) gives total Wh, then converting to kWh.
 
+For example, if your CPU is nominally **65 W**, and it’s used at **50%** for **10 seconds**:
 
-# UserInstruction
-open a terminal and navigate to the App folder (or in vs code right click on the App folder and open in integrated Terminal)
+-   Approx. power = 65 W ×\times× 0.5 = **32.5 W**
+-   Time = 10 seconds = 10/3600 hours = 0.00278 h
+-   Energy = 32.5 W ×\times× 0.00278 h ≈0.0904Wh\approx 0.0904 Wh≈0.0904Wh = 0.0000904 kWh
 
-## Enter the following command in the terminal
-fastapi dev main.py
+### 2) Carbon Intensity (I)
 
-## Leave terminal open and open second terminal - Execute the following terminal commands one after the other, what the app does should be visible in the first terminal and in the log  
+We choose a **carbon intensity** in **gCO₂/kWh** by:
 
-## Aufruf um die get_status Methode zu testen 
-Invoke-WebRequest -Uri "http://127.0.0.1:8000/get_status" -Method GET
-curl -X GET http://127.0.0.1:8000/get_status
+-   Asking the user for the country code.
+-   Looking up a predefined average (e.g., 300 for Germany, 60 for France, etc.).
+-   If no match, we use a default of 300 gCO₂/kWh.
 
+You could improve accuracy by calling an external API like [Electricity Maps](https://www.electricitymaps.com/), which provides near-real-time grid intensities.
 
-## Call to test the get_status method 
+### 3) Hardware Carbon (M)
 
-## Define the target URL
-$uri = "http://127.0.0.1:8000/deploy"  
+In reality, **embodied carbon** or **hardware carbon** is a complex topic. It often involves dividing the total carbon footprint of the machine’s manufacturing over its usable lifetime. Here, however, we **simplify** and define MMM as:
 
-## Define the JSON body
-$body = @{
-    modeltyp = "text-generation"
-    model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-    uses_chat_template = $true
-    args = @{
-        prompting = @{
-            max_new_tokens = 256
-            do_sample = $true
-            temperature = 0.7
-            top_k = 50
-            top_p = 0.95
-        }
-        deployment = @{
-            torch_dtype = "torch.bfloat16"
-            device_map = "auto"
-        }
-    }
-} | ConvertTo-Json -Depth 10  # Convert to JSON with sufficient depth
+M=E×I M = E \times IM=E×I
 
-## Perform the POST request
-$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
+meaning we assume the hardware’s share of carbon is essentially the same as the operational energy usage. This is a **placeholder** approach.
 
-## Output the response
-$response.Content
+### 4) Result Metric (R)
 
+Finally, we ask the user for **RRR**, a count of the “units of service” the software provided (e.g., how many requests, tasks, or transactions happened during the measured period). This helps us express emissions **per unit** of software outcome.
 
+### 5) SCI Formula
 
-### Aufruf um die process_prompt Methode zu testen
+Putting it all together:
 
-# Define the API endpoint
-$uri = "http://127.0.0.1:8000/process_prompt"  
+SCI=(E×I)+MR \text{SCI} = \frac{(E \times I) + M}{R} SCI=R(E×I)+M​
 
-## Define the JSON body
-$body = @{
-    question = "What is the capital of France?"
-} | ConvertTo-Json -Depth 10  # Convert the hashtable to JSON format
+Given our simplifications:
 
-# Perform the POST request
-$response = Invoke-WebRequest -Uri $uri -Method POST -Body $body -ContentType "application/json"
+-   E in kWh
+-   I in gCO₂/kWh
+-   M in gCO₂
+-   R is an integer count
 
-## Output the response content
-$response.Content
+The result is **SCI** in gCO₂ per result unit.
+
+----------
+
+## Interpreting the Log File
+
+Each time you run the script, it appends to `sci_score.log`:
+
+-   **Timestamp**
+-   **CPU Nominal Power**
+-   **Measurement Duration**
+-   **Country Code** and **Grid Intensity**
+-   **Estimated CPU Energy** (kWh)
+-   **Hardware Carbon** (gCO₂)
+-   **Result Metric** (R)
+-   **SCI Score** (gCO₂/unit)
+
+You’ll see multiple runs stacked one after another. This helps keep track of your measurements over time.
+
+----------
+
+## Limitations & Disclaimer
+
+-   This tool provides **approximations**. Real hardware power usage can vary beyond the nominal TDP/TPW. CPU turbo modes, thermal conditions, and other components (RAM, GPU, etc.) can affect actual consumption.
+-   The hardware carbon is simplified as E×IE \times IE×I, whereas real embodied carbon should be considered over the product’s entire lifecycle.
+-   The carbon intensities provided are just **typical averages** and can be much higher or lower depending on the time of day, region, and energy mix.
+-   This method is still useful to get a **rough sense** of your software’s carbon footprint and track improvements over time.
+
+----------
+
+## Further Improvements
+
+1.  **Use Real-time Carbon Data**
+    
+    -   Integrate an API call to [Electricity Maps](https://www.electricitymaps.com/) to get the actual gCO₂/kWh for the user’s location.
+2.  **Include More Hardware**
+    
+    -   Estimate or measure GPU, RAM, or network energy consumption if relevant.
+3.  **Refine M**
+    
+    -   Calculate actual **embodied carbon**: gather info about the hardware’s lifecycle emissions (LCA) and distribute it over the total hours or usage.
+4.  **Automate Data Collection**
+    
+    -   You could run the script regularly (e.g., via cron) and track changes in a database or dashboard.
+5.  **Integration**
+    
+    -   Integrate with CI/CD pipelines to evaluate software carbon intensity upon each build or deployment.

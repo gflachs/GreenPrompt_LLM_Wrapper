@@ -18,7 +18,7 @@ class ModelConfig(BaseModel):
 
 class PromptResponse(BaseModel):
     answer: str = Field(..., description="The llm's answer to a previously asked question.")
-    sci_score: int = Field(..., description="A numerical value as a representation of the sci score as a representation of the energy consumption and the associated CO2 emissions generated during the processing of the prompt and the creation of the answer.")
+    sci_score: float = Field(..., description="A numerical value as a representation of the sci score as a representation of the energy consumption and the associated CO2 emissions generated during the processing of the prompt and the creation of the answer.")
 
 class Prompt(BaseModel):
     question: str = Field(..., description="A string formatted question which is to be answered by the llm while measuring the energy consumption needed to generate the answer")

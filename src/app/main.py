@@ -1,11 +1,14 @@
 import json
 import logging
+import time
 from typing import Any, Dict, List, Tuple
+
 
 from fastapi import FastAPI
 
 from src.app.models.request import ModelConfig, Prompt, PromptResponse
 from src.app.wrapper.llm_wrapper_manager import WrapperManager
+from src.app.sci.sci_score import start_calc_sci_score, end_calc_sci_score
 
 logging.basicConfig(
     filename="app.log",
@@ -91,8 +94,12 @@ async def process_prompt(prompt: Prompt) -> Dict[str, int]:
         sci_score = 0
     else:
         question = prompt.question
+        powerstat = start_calc_sci_score()
+        start_time = time.time()
         answer = wrapper.get_answer(question)
-        sci_score = 42 # To be implemented
+        end_time = time.time()
+        time_diff_in_ms = (end_time - start_time) * 1000
+        sci_score = end_calc_sci_score(powerstat, len(answer.split()), time_diff_in_ms, "DE")
     return {"answer": answer, "sci_score": sci_score}
 
 
