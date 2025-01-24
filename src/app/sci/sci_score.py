@@ -10,7 +10,7 @@ def start_calc_sci_score():
     """
     print("Messung mit powerstat gestartet...")
     powerstat_process = subprocess.Popen(
-        ["powerstat", "1", "-d 0"],  # 1-Sekunden-Intervall
+        ["powerstat", "1", "-d 0", "-z"],  # 1-Sekunden-Intervall
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
